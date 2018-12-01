@@ -10,6 +10,7 @@ char confere_diagonal1(char** mat,int a,char marc);
 char confere_diagonal2(char** mat,int a,char marc);
 char confere_empate(char** mat,int a);
 void mostra_matriz(char** mat,int a);
+void vez_do_computador(int n,int* vet,char marc,char** mat,int a);
 int main(){
 	int b;
 	do{
@@ -125,7 +126,8 @@ void pvp(){
 	return ;
 }
 void pve(){
-	int a,i,j,marc,coord1,coord2,res=0,jogador;
+	int a,b=0,c,d,i,j,marc,coord1,coord2,res=0,n,jogador;
+	int* vet;
 	char marc1,marc2,marc3;
 	puts("informe o tamanho do jogo da velha(de 3 a 10):");
 	scanf("%d",&a);
@@ -166,6 +168,14 @@ void pve(){
 	if(jogador==1){
 		do{
 		do{
+			if(b==0){
+				n=a*a-1;
+				b++;
+				vet=(int*)malloc(sizeof(int)*(a*a));
+				for(i=0;i<=a*a;i++){
+					vet[i]=i;
+				}
+			}
 			errado:
 			i=0;
 			printf("selecione as coordenadas onde voce quer marcar %c(de 1 a %d)",marc1,a);
@@ -189,46 +199,43 @@ void pve(){
 		if(confere_linha(mat,a,marc3)=='a'||confere_coluna(mat,a,marc3)=='a'||confere_diagonal1(mat,a,marc3)=='a'||confere_diagonal2(mat,a,marc3)=='a'||confere_empate(mat,a)=='a'){
 			goto fim;	
 		}
-		puts("loading...");
-		errado2:
-		srand(time(NULL));
-		coord1=rand()%a;
-		srand(time(NULL));
-		coord2=rand()%a;
-		if(mat[coord1][coord2]=='X'||mat[coord1][coord2]=='O'){
-			goto errado2;
+		c=a*(coord1-1)+(coord2-1);
+		for(i=0;i<=n;i++){
+			if(vet[i]==c){
+				d=vet[i];
+				vet[i]=vet[n];
+				vet[n]=d;
+			}
 		}
-		else{
-			system("cls");
-			mat[coord1][coord2]=marc2;
-		}
+		n--;
+		vez_do_computador(n,vet,marc2,mat,a);
+		system("cls");
 		mostra_matriz(mat,a);
 		marc3=marc2;
 		if(confere_linha(mat,a,marc3)=='a'||confere_coluna(mat,a,marc3)=='a'||confere_diagonal1(mat,a,marc3)=='a'||confere_diagonal2(mat,a,marc3)=='a'||confere_empate(mat,a)=='a'){
 			goto fim;	
 		}
+		n--;
 	}while(res!=1);
 }
 	else{
+		if(b==0){
+				n=a*a-1;
+				b++;
+				vet=(int*)malloc(sizeof(int)*(a*a));
+				for(i=0;i<=a*a;i++){
+					vet[i]=i;
+				}
+			}
 		do{
-		puts("loading...");
-		errado3:
-		srand(time(NULL));
-		coord1=rand()%a;
-		srand(time(NULL));
-		coord2=rand()%a;
-		if(mat[coord1][coord2]=='X'||mat[coord1][coord2]=='O'){
-			goto errado3;
-		}
-		else{
-			system("cls");
-			mat[coord1][coord2]=marc2;
-		}
+		vez_do_computador(n,vet,marc2,mat,a);
+		system("cls");
 		mostra_matriz(mat,a);
 		marc3=marc2;
 		if(confere_linha(mat,a,marc3)=='a'||confere_coluna(mat,a,marc3)=='a'||confere_diagonal1(mat,a,marc3)=='a'||confere_diagonal2(mat,a,marc3)=='a'||confere_empate(mat,a)=='a'){
 			goto fim;	
 		}
+		n--;
 		do{
 			errado4:
 			i=0;
@@ -252,10 +259,20 @@ void pve(){
 		marc3=marc1;
 		if(confere_linha(mat,a,marc3)=='a'||confere_coluna(mat,a,marc3)=='a'||confere_diagonal1(mat,a,marc3)=='a'||confere_diagonal2(mat,a,marc3)=='a'||confere_empate(mat,a)=='a'){
 			goto fim;	
-		}	
+		}
+		c=a*(coord1-1)+(coord2-1);
+		for(i=0;i<=n;i++){
+			if(vet[i]==c){
+				d=vet[i];
+				vet[i]=vet[n];
+				vet[n]=d;
+			}
+		}
+		n--;	
 		}while(res!=1);	
 	}
 	fim:
+	free(vet);
 	free(mat);
 	return;
 }
@@ -333,4 +350,15 @@ char confere_empate(char** mat,int a){
 			return 'a';
 		}
 }
-
+void vez_do_computador(int n,int* vet,char marc,char** mat,int a){
+	int b,c;
+	if(n==0){
+		n++;
+	}
+	srand(time(NULL));
+	b=rand()%n;
+	mat[vet[b]/a][vet[b]%a]=marc;
+	c=vet[b];
+	vet[b]=vet[n];
+	vet[n]=c;	
+}
