@@ -1,6 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
+struct lista{
+	char nome[50];
+	int wins;
+	struct lista* prox;
+};
 void pvp();
 void pve();
 void ranking();
@@ -11,6 +17,8 @@ char confere_diagonal2(char** mat,int a,char marc);
 char confere_empate(char** mat,int a);
 void mostra_matriz(char** mat,int a);
 void vez_do_computador(int n,int* vet,char marc,char** mat,int a);
+lista* carrega_rank();
+void registra_jogador();
 int main(){
 	int b;
 	do{
@@ -23,8 +31,15 @@ int main(){
 			case(2):
 				pve();
 				break;
-			case (3):
-				void ranking();
+			case (3):{
+				lista* aux=carrega_rank();
+				if(!aux){
+					break;
+				}
+				for(;aux;aux=aux->prox){
+					printf("jogador:%s  vitorias:%d",aux->nome,aux->wins);
+				}
+			}
 				break;
 			case (4):
 				puts("obrigado por escolher nosso programa, ate outra hora");
@@ -94,6 +109,7 @@ void pvp(){
 		mostra_matriz(mat,a);
 		marc3=marc1;
 		if(confere_linha(mat,a,marc3)=='a'||confere_coluna(mat,a,marc3)=='a'||confere_diagonal1(mat,a,marc3)=='a'||confere_diagonal2(mat,a,marc3)=='a'||confere_empate(mat,a)=='a'){
+			registra_jogador();
 			goto fim;
 		}
 		errado2:
@@ -118,6 +134,7 @@ void pvp(){
 		mostra_matriz(mat,a);
 		marc3=marc2;
 		if(confere_linha(mat,a,marc3)=='a'||confere_coluna(mat,a,marc3)=='a'||confere_diagonal1(mat,a,marc3)=='a'||confere_diagonal2(mat,a,marc3)=='a'||confere_empate(mat,a)=='a'){
+			registra_jogador();
 			goto fim;
 		}							
 	}while (res!=1);
@@ -197,6 +214,7 @@ void pve(){
 		mostra_matriz(mat,a);
 		marc3=marc1;
 		if(confere_linha(mat,a,marc3)=='a'||confere_coluna(mat,a,marc3)=='a'||confere_diagonal1(mat,a,marc3)=='a'||confere_diagonal2(mat,a,marc3)=='a'||confere_empate(mat,a)=='a'){
+			registra_jogador();
 			goto fim;	
 		}
 		c=a*(coord1-1)+(coord2-1);
@@ -258,6 +276,7 @@ void pve(){
 		mostra_matriz(mat,a);
 		marc3=marc1;
 		if(confere_linha(mat,a,marc3)=='a'||confere_coluna(mat,a,marc3)=='a'||confere_diagonal1(mat,a,marc3)=='a'||confere_diagonal2(mat,a,marc3)=='a'||confere_empate(mat,a)=='a'){
+			registra_jogador();
 			goto fim;	
 		}
 		c=a*(coord1-1)+(coord2-1);
@@ -361,4 +380,84 @@ void vez_do_computador(int n,int* vet,char marc,char** mat,int a){
 	c=vet[b];
 	vet[b]=vet[n];
 	vet[n]=c;	
+}
+lista* carrega_rank(){
+	lista* list1=(lista*)malloc(sizeof(lista));
+	lista* list2=(lista*)malloc(sizeof(lista));
+	FILE *arq=fopen("ranking.txt","r");
+	if(!arq){
+		puts("ranking inexistente");
+		goto close;
+	}
+	char linha[50];
+	if(feof(arq)){
+		puts("arquivo vazio");
+		goto close;
+	}
+	fgets(linha,50,arq);
+	list1->nome=strtok(linha,",");
+	list1->wins=atoi(strtok(NULL,","));
+	list1->prox=0;
+	while(!feof(arq)){
+		fgets(linha,50,arq);
+		list2->nome=strtok(linha,",");
+		list2->wins=atoi(strtok(NULL,","));
+		list2->prox=0;
+		list1->prox=list2;
+		list1=list2;
+	}
+	close:
+	fclose(arq);
+	return list1;
+}
+void registra_jogador(){
+	int a=0,b;
+	char c[40],d[50];
+	while(a==0){
+		puts("o jogador vencedor deseja registrar seu nome no ranking?(1 para sim, 2 para nao)");
+		scanf("%d",&b);
+		if(b==1||b==2){
+			a++;
+		}
+		else{
+			puts("opcao invalida tente novamente");
+		}
+	}
+	a=0;
+	if(b==1){
+		while(a==0){
+			puts("informe seu nome de jogador(maximo 40 caracteres)");
+			scanf("%s",c);
+			if(strlen(c)>40){
+				puts("caracteres demais,escolha outro nome");
+			}
+			else{
+				a++;
+			}
+		}
+		a=0;
+		lista* aux=carrega_rank();
+		while(aux){
+			if(strcmp(aux->nome,c)==0){
+				aux->wins++;
+				a++;
+			}
+			aux=aux->prox;
+		}
+		if(a==0){
+			FILE *arq=fopen("ranking.txt","a");
+			c=strcat(c,",1");
+			fprintf(arq,c);
+			fclose(arq);
+		}
+		else{
+			FILE *arq=fopen("ranking.txt","w");
+			aux=carrega_rank();
+			while(aux){
+				fprintf(arq,"%s,%d",aux->nome,aux->wins);
+				aux=aux->prox;
+			}
+			fclose(arq);
+		}
+	}	
 }
