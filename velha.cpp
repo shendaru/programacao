@@ -3,13 +3,12 @@
 #include <time.h>
 #include <string.h>
 struct lista{
-	char nome[50];
+	char* nome=(char*)malloc(50*sizeof(char));
 	int wins;
 	struct lista* prox;
 };
 void pvp();
 void pve();
-void ranking();
 char confere_linha(char** mat,int a,char marc);
 char confere_coluna(char** mat,int a,char marc);
 char confere_diagonal1(char** mat,int a,char marc);
@@ -37,7 +36,7 @@ int main(){
 					break;
 				}
 				for(;aux;aux=aux->prox){
-					printf("jogador:%s  vitorias:%d",aux->nome,aux->wins);
+					printf("jogador:%s  vitorias:%d\n",aux->nome,aux->wins);
 				}
 			}
 				break;
@@ -52,6 +51,8 @@ int main(){
 				break;			
 		}	
 	}while(b!=4);
+	free(list1);
+	free(list2);
 	return 0;
 }
 void pvp(){
@@ -412,7 +413,8 @@ lista* carrega_rank(){
 }
 void registra_jogador(){
 	int a=0,b;
-	char c[40],d[50];
+	char d[50];
+	char *c=(char*)malloc(40*sizeof(char));
 	while(a==0){
 		puts("o jogador vencedor deseja registrar seu nome no ranking?(1 para sim, 2 para nao)");
 		scanf("%d",&b);
@@ -446,7 +448,7 @@ void registra_jogador(){
 		}
 		if(a==0){
 			FILE *arq=fopen("ranking.txt","a");
-			c=strcat(c,",1");
+			c=strcat(c,",1\n");
 			fprintf(arq,c);
 			fclose(arq);
 		}
@@ -457,6 +459,7 @@ void registra_jogador(){
 				fprintf(arq,"%s,%d",aux->nome,aux->wins);
 				aux=aux->prox;
 			}
+			free(c);
 			fclose(arq);
 		}
 	}	
