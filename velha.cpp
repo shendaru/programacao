@@ -51,8 +51,6 @@ int main(){
 				break;			
 		}	
 	}while(b!=4);
-	free(list1);
-	free(list2);
 	return 0;
 }
 void pvp(){
@@ -299,31 +297,17 @@ void pve(){
 void mostra_matriz(char** mat,int a){
 	int i,j;
 	for(i=0;i<a;i++){
-			for(j=0;j<a;j++){
-				printf("%c\t",mat[i][j]);
-			}
-			printf("\n\n");
+		for(j=0;j<a;j++){
+			printf("%c\t",mat[i][j]);
 		}
+		printf("\n\n");
+	}
 }
 char confere_linha(char** mat,int a,char marc){
 	int i,j,qnt;
 	for(i=0,qnt=0;i<a;i++){
-			for(j=0;j<a;j++){
+		for(j=0;j<a;j++){
 			if(mat[i][j]==marc){
-				qnt++;
-			}
-			if(qnt==a){
-				printf("fim do jogo, %c ganhou\n\n",marc);
-				return 'a';
-			}
-			}
-			qnt=0;}
-}
-char confere_coluna(char** mat,int a,char marc){
-	int i,j,qnt;
-		for(i=0,qnt=0;i<a;i++){
-			for(j=0;j<a;j++){
-			if(mat[j][i]==marc){
 				qnt++;
 			}
 			if(qnt==a){
@@ -332,43 +316,60 @@ char confere_coluna(char** mat,int a,char marc){
 			}
 		}
 		qnt=0;
+	}
+}
+char confere_coluna(char** mat,int a,char marc){
+	int i,j,qnt;
+	for(i=0,qnt=0;i<a;i++){
+		for(j=0;j<a;j++){
+			if(mat[j][i]==marc){
+				qnt++;
+			}
+			if(qnt==a){
+				printf("fim do jogo, %c ganhou\n\n",marc);
+				return 'a';
+			}
 		}
+	qnt=0;
+	}
 }
 char confere_diagonal1(char** mat,int a,char marc){
 	int i,j,qnt;
 	for(i=0,j=0,qnt=0;j<a&&i<a;i++,j++){
-			if(mat[i][j]==marc){
-				qnt++;
-		}}
-		if(qnt==a){
-				printf("fim do jogo, %c ganhou\n\n",marc);
-				return 'a';
+		if(mat[i][j]==marc){
+			qnt++;
 		}
+	}
+	if(qnt==a){
+		printf("fim do jogo, %c ganhou\n\n",marc);
+		return 'a';
+	}
 }
 char confere_diagonal2(char** mat,int a,char marc){
 	int i,j,qnt;
 	for(i=a-1,j=0,qnt=0;j<a&&i>=0;i--,j++){
-			if(mat[i][j]==marc){
-				qnt++;
-		}}
-		if(qnt==a){
-				printf("fim do jogo, %c ganhou\n\n",marc);
-				return 'a';
+		if(mat[i][j]==marc){
+			qnt++;
 		}
+	}
+	if(qnt==a){
+		printf("fim do jogo, %c ganhou\n\n",marc);
+		return 'a';
+	}
 }
 char confere_empate(char** mat,int a){
 	int i,j,qnt;
 	for(i=0,qnt=0;i<a;i++){
-			for(j=0;j<a;j++){
-				if(mat[i][j]!='-'){
-					qnt++;
-				}
+		for(j=0;j<a;j++){
+			if(mat[i][j]!='-'){
+				qnt++;
 			}
 		}
-		if(qnt==a*a){
-			puts("empate\n\n");
-			return 'a';
-		}
+	}
+	if(qnt==a*a){
+		puts("empate\n\n");
+		return 'a';
+	}
 }
 void vez_do_computador(int n,int* vet,char marc,char** mat,int a){
 	int b,c;
@@ -385,10 +386,10 @@ void vez_do_computador(int n,int* vet,char marc,char** mat,int a){
 lista* carrega_rank(){
 	lista* list1=(lista*)malloc(sizeof(lista));
 	lista* list2=(lista*)malloc(sizeof(lista));
+	lista* list0=(lista*)malloc(sizeof(lista));
 	FILE *arq=fopen("ranking.txt","r");
 	if(!arq){
 		puts("ranking inexistente");
-		goto close;
 	}
 	char linha[50];
 	if(feof(arq)){
@@ -399,13 +400,14 @@ lista* carrega_rank(){
 	list1->nome=strtok(linha,",");
 	list1->wins=atoi(strtok(NULL,","));
 	list1->prox=0;
+	list0=list1;
 	while(!feof(arq)){
 		fgets(linha,50,arq);
 		list2->nome=strtok(linha,",");
 		list2->wins=atoi(strtok(NULL,","));
 		list2->prox=0;
-		list1->prox=list2;
-		list1=list2;
+		list0->prox=list2;
+		list0=list2;
 	}
 	close:
 	fclose(arq);
